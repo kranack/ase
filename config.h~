@@ -1,0 +1,35 @@
+/******************************************
+ * TP 5 - Bibliothèque Config
+ * @authors: Damien Calesse, Henri Larget
+ * @file: config.h
+ ******************************************/
+
+/* On définie les valeurs relatives au HDA (hardware.ini) */
+
+#define HDA_DATAREGS 0x110
+#define HDA_CMDREG 0x3F6
+#define HDA_IRQ 14
+
+#define HDA_SECTORSIZE 256
+#define HDA_MAXCYLINDER 16
+#define HDA_MAXSECTOR 16
+
+/* GLOBAL */
+
+#define TRUE 1
+#define MAXVOL 8
+#define MBR_MAGIC 0XFACADE
+
+enum voltype_e {VT_NOVOL, VT_BASE, VT_ANEX, VT_OTHER};
+
+struct vol_descr_s {
+	unsigned int vol_cylinder;
+	unsigned int vol_sector;
+	unsigned int vol_nsector;
+	enum voltype_e vol_voltype;
+};
+
+struct mbr_s {
+	struct vol_descr_s mbr_vols[MAXVOL];
+	unsigned int mbr_magic;
+};
