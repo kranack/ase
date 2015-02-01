@@ -5,7 +5,9 @@ ROOTDIR=.
 
 CC	= gcc
 CFLAGS	= -Wall -ansi -pedantic
-CFLAGS  += -std=iso9899:1999
+CFLAGS	+= -std=gnu99
+#CFLAGS  += -std=iso9899:1999
+#CFLAGS 	+= -std=c99 -D_XOPEN_SOURCE>=500
 CFLAGS  += -g -m32
 LIBDIR  = $(ROOTDIR)/lib
 INCDIR  = -I$(ROOTDIR)/include

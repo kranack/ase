@@ -1,12 +1,7 @@
 /* ------------------------------
-   $Id: vm-skel.c,v 1.1 2002/10/21 07:16:29 marquet Exp $
-   ------------------------------------------------------------
 
-   Volume manager skeleton.
-   Philippe Marquet, october 2002
-
-   1- you must complete the NYI (not yet implemented) functions
-   2- you may add commands (format, etc.)
+	Bash.c -- Bash for FileSystem
+	Damien Calesse, janvier 2015
    
 */
 
@@ -36,6 +31,7 @@ struct _args {
 	int argc;
 };
 
+static void echo(struct _cmd *c);
 static void pwd(struct _cmd *c);
 static void ls(struct _cmd *c);
 static void mkdir(struct _cmd *c);
@@ -48,6 +44,7 @@ static void xit(struct _cmd *c);
 static void none(struct _cmd *c) ;
 
 static struct _cmd commands [] = {
+	{"echo",	echo,	"print something"},
 	{"pwd",		pwd,	"display current directory"},
 	{"ls", 		ls, 	"display directory content"},
     {"mkdir", 	mkdir, 	"create a new directory"},
@@ -87,15 +84,15 @@ execute(char *name)
 		if (argc == 0){
 			sprintf(n, "%s", tmp);
 		}
-		if (tmp != " \n") {
+		if (strcmp(tmp, " \n")) {
 			argv[argc] = tmp;
 		}
-		tmp = strtok(NULL, " ");
+		tmp = strtok(NULL, " \n");
 		argc++;
 	}
 	args->argv = argv;
 	args->argc = argc;
-	printf("name:%s; n:%s\n", name, n);
+
     while (c->name && strcmp (n, c->name))
 	c++;
     (*c->fun)(c);
@@ -115,6 +112,12 @@ loop(void)
 /* ------------------------------
    command execution 
    ------------------------------------------------------------*/
+
+static void
+echo(struct _cmd *c)
+{
+	fprintf(stdout, "%s\n", args->argv[1]);
+}
 
 static void
 pwd(struct _cmd *c)
@@ -162,14 +165,21 @@ touch(struct _cmd *c)
 	fprintf(stdout, "inumber of new file: %u;name: %s\n", inumber, args->argv[1]);
 	int r = add_entry(inumber_of_path(current_directory), inumber, args->argv[1]);
 	fprintf(stdout, "return value: %i\n", r);
-	save_super();
-	//printf("%s NYI\n", c->name);
 }
 
 static void
 cat(struct _cmd *c)
 {
-	    printf("%s NYI\n", c->name);
+	char *file_path = current_directory;
+	if (!strcmp(file_path, "/"))
+		//fprintf(stdout, "ok\n");
+		sprintf(file_path, "%s%s", current_directory, args->argv[1]);
+	else
+		fprintf(stdout, "ko\n");
+		//sprintf("%s/%s", current_directory, args->argv[1]);
+	unsigned int inumber = inumber_of_path(file_path);
+	fprintf(stdout, "inumber: %u\n", inumber);
+
 }
 
 static void

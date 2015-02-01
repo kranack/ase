@@ -77,8 +77,7 @@ add_entry(unsigned int idir, unsigned int inumber, const char *basename)
     file_desc_t _fd, *fd = &_fd;
     struct entry_s entry; 
     unsigned int ientry = 0;
-    int nbyte; 
-    int status;
+    int nbyte;
 	    
     /* a directory inode? */
     read_inode(idir, &inode); 
@@ -96,15 +95,15 @@ add_entry(unsigned int idir, unsigned int inumber, const char *basename)
     /* built the entry */
     entry.ent_inumber = inumber;
     strncpy(entry.ent_basename, basename, ENTRYMAXLENGTH);
-    entry.ent_basename[ENTRYMAXLENGTH] = 0;
+    entry.ent_basename[ENTRYMAXLENGTH-1] = '\0';
 
     /* seek to the right position */
     seek2_ifile(fd, ientry * sizeof(struct entry_s));
     
     /* write the entry */
     nbyte = write_ifile(fd, &entry, sizeof(struct entry_s));
-	inode.ind_size += sizeof(struct entry_s);
-	write_inode(idir, &inode);
+	//inode.ind_size += sizeof(struct entry_s);
+	//write_inode(idir, &inode);
 	//printf("fd->fds_buf:%s\n",  fd->fds_buf);
     /* done */
     close_ifile(fd); /* even in case of write failure */
@@ -159,26 +158,22 @@ void list_entries(unsigned int idir, const char *basename)
 {
 	struct inode_s inode;
 	file_desc_t _fd, *fd = &_fd;
-	unsigned int ientry;
 	struct entry_s entry;
 	unsigned int n_entry;
-	int status;
 	
 	read_inode(idir, &inode);
 	if (inode.ind_type != directory)
-		return 0;
-	printf("dir size: %u\n", inode.ind_size);
-	printf("ind_direct[0]: %u\t ind_direct[1]:%u\n", inode.ind_direct[0], inode.ind_direct[1]);
+		return ;
+	printf("dir size: %u; entry size: %u\n", inode.ind_size, sizeof(struct entry_s));
 	n_entry = inode.ind_size / sizeof(struct entry_s);
-	fprintf(stdout, "%u file(s) in this directory\n", n_entry);
-	fflush(stdout);
+
 	open_ifile(fd, idir);
 	
+	fprintf(stdout, "total %u\n", n_entry);
 	for (int i=0; i < n_entry; i++)
 	{
 		read_ifile(fd, &entry, sizeof(struct entry_s));
-		fprintf(stdout, "%u \t %s\n", entry.ent_inumber, entry.ent_basename);
-		fflush(stdout);
+		fprintf(stdout, "%u\t%s\n", entry.ent_inumber, entry.ent_basename);
 	}
 }
 
@@ -189,9 +184,9 @@ void make_directory(unsigned int idir, const char *basename)
 	unsigned int inumber;
 
 	read_inode(idir, &inode);
-
+	
 	if (inode.ind_type != directory)
-		return 0;
+		return ;
 
 	inumber = create_inode(directory);
 	add_entry(idir, inumber, basename);	
