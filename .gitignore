@@ -39,5 +39,5 @@ Thumbs.db
 #Specific project files
 #######################
 *.*~
-*.swap
+*.swp
 *.swo
